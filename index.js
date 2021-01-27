@@ -1,5 +1,4 @@
 fs=require('fs')
-
 //Retire les deux premiers arguments qui sont toujours les mêmes
 let myArgs = process.argv.slice(2);
 //Si on retrouve un argument -action:
@@ -31,6 +30,16 @@ if (myArgs[0] === '-action'){
 
     case 'search_date':
       console.log('Recherche de film par année de production');
+      //Stockage des input/output
+      input_dir=myArgs[2];
+      year=myArgs[3];
+      sorted=myArgs[4];
+      //Fonction tri/affichage nom des films de l'année <year>
+      search_date(input_dir,year,sorted)
+      break;
+
+    case 'search_key_word':
+      console.log('Recherche du film le plus récent mots clés');
       //Stockage des input/output
       input_dir=myArgs[2];
       year=myArgs[3];
