@@ -15,6 +15,8 @@ if (myArgs[0] === '-action'){
       console.log("Dossier d'output: " + output_dir);
       //Lancer fonction tri date
       sort_date(input_dir,output_dir);
+      let stop = new Date().getTime();
+      console.log("Temps éxécuté : " + (stop - start) + " ms")
       break;
 
     case 'sort_title': 
@@ -26,6 +28,8 @@ if (myArgs[0] === '-action'){
       console.log("Dossier d'output: " + output_dir);
       //Lancer fonction tri titre
       sort_title(input_dir,output_dir);
+      let stop1 = new Date().getTime();
+      console.log("Temps éxécuté : " + (stop1 - start) + " ms")
       break;
 
     case 'search_date':
@@ -36,6 +40,8 @@ if (myArgs[0] === '-action'){
       sorted=myArgs[4];
       //Fonction tri/affichage nom des films de l'année <year>
       search_date(input_dir,year,sorted)
+      let stop2 = new Date().getTime();
+      console.log("Temps éxécuté : " + (stop2 - start) + " ms")
       break;
 
     case 'search_key_word':
@@ -50,6 +56,8 @@ if (myArgs[0] === '-action'){
 
     //Dans le cas où il y a une erreur d'argument  
     default:
+      let stop3 = new Date().getTime();
+      console.log("Temps éxécuté : " + (stop3 - start) + " ms")
       console.log("Je n'ai pas compris..")
   }
 }
