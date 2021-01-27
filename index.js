@@ -19,15 +19,26 @@ if (myArgs[0] === '-action'){
       break;
 
     case 'sort_title': 
-    console.log('Tri par titre');
-    //Stockage des input/output (strings) 
-    input_dir = myArgs[2];
-    output_dir = myArgs[3];
-    console.log("Fichier d'input: " + input_dir);
-    console.log("Dossier d'output: " + output_dir);
-    //Lancer fonction tri titre
-    sort_title(input_dir,output_dir);
-    break;
+      console.log('Tri par titre');
+      //Stockage des input/output (strings) 
+      input_dir = myArgs[2];
+      output_dir = myArgs[3];
+      console.log("Fichier d'input: " + input_dir);
+      console.log("Dossier d'output: " + output_dir);
+      //Lancer fonction tri titre
+      sort_title(input_dir,output_dir);
+      break;
+
+    case 'search_date':
+      console.log('Recherche de film par année de production');
+      //Stockage des input/output
+      input_dir=myArgs[2];
+      year=myArgs[3];
+      sorted=myArgs[4];
+      //Fonction tri/affichage nom des films de l'année <year>
+      search_date(input_dir,year,sorted)
+      break;
+
     //Dans le cas où il y a une erreur d'argument  
     default:
       console.log("Je n'ai pas compris..")
@@ -128,6 +139,36 @@ function part_title(tab,first,last,pivot){
   swap(tab,last,j)
   //Renvoie j
   return j
+}
+
+//Fonction lecture du fichier + affichage console: titre des film triés selon une année précise
+function search_date(input,year,sorted){
+  //Lecture du fichier 'input'
+  fs.readFile(input, (err, data) => {
+    if (err) throw err;
+    //Stock des données dans tab
+    let tab = (JSON.parse(data));
+    //Vérification de la valeur "true/false" de sorted
+    if(sorted === 'true'){
+      console.log('true');
+    }
+    else if(sorted === 'false'){
+      for(i=0;i<tab.length;i++){
+        //Extraction de l'année de parution pour chaque film à l'aide d'une boucle for
+        date = new Date(tab[i].release_date * 1000)
+        date_year = date.getFullYear();
+        //Si l'année du film correspond à la demande utilisateur
+        if(date_year == year){
+          //Afficher le titre de celui-ci (+année)
+          console.log(tab[i].title + ' ('+year+')');
+        }
+      }
+    }
+    else{
+      //Case erreur sorted
+      console.log('error in sorted value');
+    }
+  });
 }
 
 //Fonction swap qui échange de place deux élément d'un tableau
