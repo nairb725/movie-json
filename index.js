@@ -12,7 +12,7 @@ if (myArgs[0] === '-action'){
       input_dir = myArgs[2];
       output_dir = myArgs[3];
       console.log("Fichier d'input: " + input_dir);
-      console.log("Dossier d'output: " + output_dir);
+      console.log("Fichier d'output: " + output_dir);
       //Lancer fonction tri date
       sort_date(input_dir,output_dir);
       let stop = new Date().getTime();
@@ -34,7 +34,7 @@ if (myArgs[0] === '-action'){
 
     case 'search_date':
       console.log('Recherche de film par année de production');
-      //Stockage des input/output
+      //Stockage des input utilisateurs
       input_dir=myArgs[2];
       year=myArgs[3];
       sorted=myArgs[4];
@@ -45,13 +45,13 @@ if (myArgs[0] === '-action'){
       break;
 
     case 'search_key_word':
-      console.log('Recherche du film le plus récent mots clés');
-      //Stockage des input/output
-      input_dir=myArgs[2];
-      year=myArgs[3];
-      sorted=myArgs[4];
-      //Fonction tri/affichage nom des films de l'année <year>
-      search_date(input_dir,year,sorted)
+      console.log('Recherche du film le plus récent dans un genre donné avec un mot clé');
+      //Stockage des input utilisateurs
+      input_dir = myArgs[2];
+      keyword=myArgs[3];
+      genre=myArgs[4];
+      //Fonction affichage du filme le plus récent, dans un genre donné, avec un mot clé spécifique
+      search_key_word(input_dir,keyword,genre)
       break;
 
     //Dans le cas où il y a une erreur d'argument  
@@ -186,6 +186,25 @@ function search_date(input,year,sorted){
       console.log('error in sorted value');
     }
   });
+}
+//Fonction lecture du fichier + affichage console: titre du film le plus récent + genre + mot clé
+function search_key_word(input,keyword,genre){
+  //Lecture du fichier 'input'
+  fs.readFile(input, (err, data) => {
+    if (err) throw err;
+    //Stock des données dans tab
+    let tab = (JSON.parse(data));
+    //Vérification de la valeur
+    for(i=0;i<tab.length;i++){
+      if(tab[i].genres){
+        if((tab[i].genres).includes(genre)){
+          if(tab[i]){
+
+          }
+        }
+      }
+    }
+});
 }
 
 //Fonction swap qui échange de place deux élément d'un tableau
