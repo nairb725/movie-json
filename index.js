@@ -55,6 +55,7 @@ if (myArgs[0] === '-action'){
       console.log("Je n'ai pas compris..")
   }
 }
+
 //fonction pour mettre la date après le titre
 function date(input,output_dir){
   //Lecture du fichier 'input'
