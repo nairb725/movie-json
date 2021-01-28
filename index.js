@@ -5,166 +5,101 @@ ColorThief = require('color-thief-jimp');
 let start = new Date().getTime();
 //Retire les deux premiers arguments qui sont toujours les mêmes
 let myArgs = process.argv.slice(2);
-//Si on retrouve un argument -action:
-if (myArgs[0] === '-action'){
-  //Checking de l'argument suivant '-action'
-  switch (myArgs[1]){
-     //Tri par date croissante
-     case 'transform':
-      console.log('Tri par date');
-      //Stockage des input/output (strings) 
-      input_dir = myArgs[2];
-      output_dir = myArgs[3];
-      console.log("Fichier d'input: " + input_dir);
-      console.log("Dossier d'output: " + output_dir);
-      //Lancer fonction tri date
-      date(input_dir,output_dir);
-      let stop1 = new Date().getTime();
-      console.log("Algorithme exécuté en: " + stop1-start + " ms");
-      break;
-    //Tri par date croissante
-    case 'sort_date':
-      console.log('Tri par date');
-      //Stockage des input/output (strings) 
-      input_dir = myArgs[2];
-      output_dir = myArgs[3];
-      console.log("Fichier d'input: " + input_dir);
-      console.log("Dossier d'output: " + output_dir);
-      //Lancer fonction tri date
-      sort_date(input_dir,output_dir);
-      let stop2 = new Date().getTime();
-      console.log("Algorithme exécuté en: " + stop2-start + " ms");
-      break;
+let save_path;
 
-    case 'sort_title': 
-      console.log('Tri par titre');
-      //Stockage des input/output (strings) 
-      input_dir = myArgs[2];
-      output_dir = myArgs[3];
-      console.log("Fichier d'input: " + input_dir);
-      console.log("Dossier d'output: " + output_dir);
-      //Lancer fonction tri titre
-      sort_title(input_dir,output_dir);
-      let stop3 = new Date().getTime();
-      console.log("Algorithme exécuté en: " + (stop3-start) + " ms");
-      break;
-
-    case 'search_date':
-      console.log('Recherche de film par année de production');
-      //Stockage des input/output
-      input_dir=myArgs[2];
-      year=myArgs[3];
-      sorted=myArgs[4];
-      //Fonction tri/affichage nom des films de l'année <year>
-      search_date(input_dir,year,sorted)
-      let stop4 = new Date().getTime();
-      console.log("Algorithme exécuté en: " + (stop4-start) + " ms");
-      break;
-    
-    case 'search_key_word':
-      console.log('Recherche du film le plus récent, genre: ['+myArgs[4]+'] et qui comporte le mot clé ['+ myArgs[3]+']');
-      //Stockage des input/output
-      input_dir=myArgs[2];
-      keyword=myArgs[3];
-      genre=myArgs[4];
-      //Fonction tri/affichage nom des films de l'année <year>
-      search_key_word(input_dir,keyword,genre)
-      let stop5 = new Date().getTime();
-      console.log("Algorithme exécuté en: "+ (stop5-start) +" ms");
-      break;
-
-    case 'color':
-      //Dossier des images
-      path_dir=myArgs[2];
-      color_read(path_dir);
-      break;
-
-    //Dans le cas où il y a une erreur d'argument  
-    default:
-      console.log("Je n'ai pas compris..")
-  }
+//Si on retrouve -save en premier argument
+if (myArgs[0] === '-save'){
+  //On récupère le path pour sauvegarder les images
+  save_path = myArgs[1]
+  //On supprime les deux arguments pour pouvoir lancer le "menu switch"
+  myArgs = myArgs.slice(2)
+  //switch_menu
+  switch_menu(save_path);
+}
+else{
+  //switch_menu avec un "save_path" undefined, les fonctions de téléchargeront donc pas les poster
+  switch_menu(save_path)
 }
 
-if (myArgs[0] === '-save'){
-  save_path = myArgs[1]
-  myArgs = myArgs.slice(2)
-  if(myArgs[0] === '-action')
-  //Checking de l'argument suivant '-action'
-  switch (myArgs[1]){
-     //Tri par date croissante
-     case 'transform':
-      console.log('Tri par date');
-      //Stockage des input/output (strings) 
-      input_dir = myArgs[2];
-      output_dir = myArgs[3];
-      console.log("Fichier d'input: " + input_dir);
-      console.log("Dossier d'output: " + output_dir);
-      //Lancer fonction tri date
-      date(input_dir,output_dir);
-      let stop1 = new Date().getTime();
-      console.log("Algorithme exécuté en: " + stop1-start + " ms");
-      break;
-    //Tri par date croissante
-    case 'sort_date':
-      console.log('Tri par date');
-      //Stockage des input/output (strings) 
-      input_dir = myArgs[2];
-      output_dir = myArgs[3];
-      console.log("Fichier d'input: " + input_dir);
-      console.log("Dossier d'output: " + output_dir);
-      //Lancer fonction tri date
-      sort_date(input_dir,output_dir);
-      let stop2 = new Date().getTime();
-      console.log("Algorithme exécuté en: " + stop2-start + " ms");
-      break;
+//Fonction qui va appeler d'autres fonctions en fonction des arguments
+function switch_menu(save_path) {
+  if (myArgs[0] === '-action')
+    //Checking de l'argument suivant '-action'
+    switch (myArgs[1]) {
+      //Tri par date croissante
+      case 'transform':
+        console.log('Tri par date');
+        //Stockage des input/output (strings) 
+        input_dir = myArgs[2];
+        output_dir = myArgs[3];
+        console.log("Fichier d'input: " + input_dir);
+        console.log("Dossier d'output: " + output_dir);
+        //Lancer fonction tri date
+        date(input_dir, output_dir);
+        let stop1 = new Date().getTime();
+        console.log("Algorithme exécuté en: " + stop1 - start + " ms");
+        break;
+      //Tri par date croissante
+      case 'sort_date':
+        console.log('Tri par date');
+        //Stockage des input/output (strings) 
+        input_dir = myArgs[2];
+        output_dir = myArgs[3];
+        console.log("Fichier d'input: " + input_dir);
+        console.log("Dossier d'output: " + output_dir);
+        //Lancer fonction tri date
+        sort_date(input_dir, output_dir);
+        let stop2 = new Date().getTime();
+        console.log("Algorithme exécuté en: " + stop2 - start + " ms");
+        break;
 
-    case 'sort_title': 
-      console.log('Tri par titre');
-      //Stockage des input/output (strings) 
-      input_dir = myArgs[2];
-      output_dir = myArgs[3];
-      console.log("Fichier d'input: " + input_dir);
-      console.log("Dossier d'output: " + output_dir);
-      //Lancer fonction tri titre
-      sort_title(input_dir,output_dir);
-      let stop3 = new Date().getTime();
-      console.log("Algorithme exécuté en: " + (stop3-start) + " ms");
-      break;
+      case 'sort_title':
+        console.log('Tri par titre');
+        //Stockage des input/output (strings) 
+        input_dir = myArgs[2];
+        output_dir = myArgs[3];
+        console.log("Fichier d'input: " + input_dir);
+        console.log("Dossier d'output: " + output_dir);
+        //Lancer fonction tri titre
+        sort_title(input_dir, output_dir);
+        let stop3 = new Date().getTime();
+        console.log("Algorithme exécuté en: " + (stop3 - start) + " ms");
+        break;
 
-    case 'search_date':
-      console.log('Recherche de film par année de production');
-      //Stockage des input/output
-      input_dir=myArgs[2];
-      year=myArgs[3];
-      sorted=myArgs[4];
-      //Fonction tri/affichage nom des films de l'année <year>
-      search_date(input_dir,year,sorted,save_path)
-      let stop4 = new Date().getTime();
-      console.log("Algorithme exécuté en: " + (stop4-start) + " ms");
-      break;
-    
-    case 'search_key_word':
-      console.log('Recherche du film le plus récent, genre: ['+myArgs[4]+'] et qui comporte le mot clé ['+ myArgs[3]+']');
-      //Stockage des input/output
-      input_dir=myArgs[2];
-      keyword=myArgs[3];
-      genre=myArgs[4];
-      //Fonction tri/affichage nom des films de l'année <year>
-      search_key_word(input_dir,keyword,genre,save_path)
-      let stop5 = new Date().getTime();
-      console.log("Algorithme exécuté en: "+ (stop5-start) +" ms");
-      break;
+      case 'search_date':
+        console.log('Recherche de film par année de production');
+        //Stockage des input/output
+        input_dir = myArgs[2];
+        year = myArgs[3];
+        sorted = myArgs[4];
+        //Fonction tri/affichage nom des films de l'année <year>
+        search_date(input_dir, year, sorted, save_path);
+        let stop4 = new Date().getTime();
+        console.log("Algorithme exécuté en: " + (stop4 - start) + " ms");
+        break;
 
-    case 'color':
-      //Dossier des images
-      path_dir=myArgs[2];
-      color_read(path_dir);
-      break;
+      case 'search_key_word':
+        console.log('Recherche du film le plus récent, genre: [' + myArgs[4] + '] et qui comporte le mot clé [' + myArgs[3] + ']');
+        //Stockage des input/output
+        input_dir = myArgs[2];
+        keyword = myArgs[3];
+        genre = myArgs[4];
+        //Fonction tri/affichage nom des films de l'année <year>
+        search_key_word(input_dir, keyword, genre, save_path);
+        let stop5 = new Date().getTime();
+        console.log("Algorithme exécuté en: " + (stop5 - start) + " ms");
+        break;
 
-    //Dans le cas où il y a une erreur d'argument  
-    default:
-      console.log("Je n'ai pas compris..")
-  }
+      case 'color':
+        //Dossier des images
+        path_dir = myArgs[2];
+        color_read(path_dir);
+        break;
+
+      //Dans le cas où il y a une erreur d'argument  
+      default:
+        console.log("Je n'ai pas compris..");
+    }
 }
 
 //fonction pour mettre la date après le titre
@@ -331,9 +266,9 @@ function search_date(input,year,sorted,save_path){
         if(date_year == year){
           //Afficher le titre de celui-ci (+année)
           console.log(tab[i].title + ' ('+year+')');
-          
+          //Si "-save path" a été appelé
           if(save_path){
-
+            //Téléchargement des poster des films triés
             const download = (url, path, callback) => {
               request.head(url, (err, res, body) => {
                 request(url)
@@ -359,8 +294,9 @@ function search_date(input,year,sorted,save_path){
         if(date_year == year){
           //Afficher le titre de celui-ci (+année)
           console.log(tab[i].title + ' ('+year+')');
+          //Si "-save path" a été appelé
           if(save_path){
-
+            //Téléchargement des poster des films triés
             const download = (url, path, callback) => {
               request.head(url, (err, res, body) => {
                 request(url)
@@ -412,9 +348,9 @@ function search_key_word(input,keyword,genre,save_path){
     let rec = new Date(filtered[0].release_date*1000)
     //Affichage du titre + date + description du film trié
     console.log(filtered[0].title+" ("+rec+"). Description: "+filtered[0].overview);
-    
+    //Si "-save path" a été appelé
     if(save_path){
-
+      //Téléchargement du poster du film trié
       const download = (url, path, callback) => {
         request.head(url, (err, res, body) => {
           request(url)
