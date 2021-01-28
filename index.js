@@ -1,4 +1,5 @@
 fs=require('fs')
+Jimp=require('jimp')
 let start = new Date().getTime();
 //Retire les deux premiers arguments qui sont toujours les mêmes
 let myArgs = process.argv.slice(2);
@@ -68,6 +69,12 @@ if (myArgs[0] === '-action'){
       search_key_word(input_dir,keyword,genre)
       let stop5 = new Date().getTime();
       console.log("Algorithme exécuté en: "+ (stop5-start) +" ms");
+      break;
+
+    case 'color':
+      path_dir=myArgs[2];
+
+      color_read(path_dir);
       break;
 
     //Dans le cas où il y a une erreur d'argument  
@@ -257,4 +264,13 @@ function swap(tab,a,b){
   let temp = tab[a];
   tab[a]=tab[b];
   tab[b]=temp;
+}
+
+function color_read(path){
+  Jimp.read(path,function (err, image) {
+    p1 = image.getPixelColor(10, 10);
+    // returns the colour of that pixel e.g. 0xFFFFFFFF
+    console.log(Jimp.intToRGBA(p1));
+    // e.g. converts 0xFFFFFFFF to {r: 255, g: 255, b: 255, a:255}
+    });
 }
