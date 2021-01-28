@@ -198,9 +198,8 @@ function search_key_word(input,keyword,genre){
     for(i=0;i<tab.length;i++){
       if(tab[i].genres){
         if((tab[i].genres).includes(genre)){
-          if(tab[i]){
-
-          }
+          desc = tab[i].overview.split(" ");
+          console.log(desc);
         }
       }
     }
