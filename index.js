@@ -1,5 +1,5 @@
 fs=require('fs')
-
+let start = new Date().getTime();
 //Retire les deux premiers arguments qui sont toujours les mêmes
 let myArgs = process.argv.slice(2);
 //Si on retrouve un argument -action:
@@ -16,6 +16,8 @@ if (myArgs[0] === '-action'){
       console.log("Dossier d'output: " + output_dir);
       //Lancer fonction tri date
       date(input_dir,output_dir);
+      let stop1 = new Date().getTime();
+      console.log("Algorithme exécuté en: " + stop1-start + " ms");
       break;
     //Tri par date croissante
     case 'sort_date':
@@ -27,6 +29,8 @@ if (myArgs[0] === '-action'){
       console.log("Dossier d'output: " + output_dir);
       //Lancer fonction tri date
       sort_date(input_dir,output_dir);
+      let stop2 = new Date().getTime();
+      console.log("Algorithme exécuté en: " + stop2-start + " ms");
       break;
 
     case 'sort_title': 
@@ -38,6 +42,8 @@ if (myArgs[0] === '-action'){
       console.log("Dossier d'output: " + output_dir);
       //Lancer fonction tri titre
       sort_title(input_dir,output_dir);
+      let stop3 = new Date().getTime();
+      console.log("Algorithme exécuté en: " + stop3-start + " ms");
       break;
 
     case 'search_date':
@@ -48,6 +54,20 @@ if (myArgs[0] === '-action'){
       sorted=myArgs[4];
       //Fonction tri/affichage nom des films de l'année <year>
       search_date(input_dir,year,sorted)
+      let stop4 = new Date().getTime();
+      console.log("Algorithme exécuté en: " + (stop4-start) + " ms");
+      break;
+    
+    case 'search_key_word':
+      console.log('Recherche du film le plus récent, selon le genre et qui comporte le mot clé '+ myArgs[3]);
+      //Stockage des input/output
+      input_dir=myArgs[2];
+      keyword=myArgs[3];
+      genre=myArgs[4];
+      //Fonction tri/affichage nom des films de l'année <year>
+      search_key_word(input_dir,keyword,genre)
+      let stop5 = new Date().getTime();
+      console.log("Algorithme exécuté en: "+ (stop5-start) +" ms");
       break;
 
     //Dans le cas où il y a une erreur d'argument  
@@ -63,12 +83,11 @@ function date(input,output_dir){
     if (err) throw err;
     //Stock des données dans tab
     let tab = (JSON.parse(data));
-//boucle pour extraction des éléments du tableau et mise des dates
-for(i=0; i<tab.length; i++) {
-  let date = new Date(tab[i].release_date * 1000).getFullYear();
-  tab[i].title = tab[i].title + " ("+ date +")"
-}
-
+    //boucle pour extraction des éléments du tableau et mise des dates
+    for(i=0; i<tab.length; i++) {
+      let date = new Date(tab[i].release_date * 1000).getFullYear();
+      tab[i].title = tab[i].title + " ("+ date +")"
+    }
     //Ecriture du fichier 'output' avec les dates après le titre
     fs.writeFile(output_dir,JSON.stringify(tab,null,'\t'),function(err) {
       if(err) return console.error(err);
@@ -208,15 +227,28 @@ function search_key_word(input,keyword,genre){
     if (err) throw err;
     //Stock des données dans tab
     let tab = (JSON.parse(data));
+    let keywordTab =[];
     //Vérification de la valeur
     for(i=0;i<tab.length;i++){
       if(tab[i].genres){
         if((tab[i].genres).includes(genre)){
           desc = tab[i].overview.split(" ");
-          console.log(desc);
+          if(desc.includes(keyword)){
+            // console.log(tab[i].title);
+            keywordTab[i] = tab[i];
+          }
         }
       }
     }
+    //Filtering := supprime tous les éléments vides du tableau
+    let filtered = keywordTab.filter(function(){
+      return true;
+    })
+    //Fonction de tri par date croissante
+    tri_date(filtered,0,filtered.length-1);
+    let rec = new Date(filtered[0].release_date*1000)
+    //Affichage du titre + date + description du film trié
+    console.log(filtered[0].title+" ("+rec+"). Description: "+filtered[0].overview);
 });
 }
 
