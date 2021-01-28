@@ -277,10 +277,10 @@ function search_date(input,year,sorted,save_path){
               })
             }
             const url = tab[i].poster
-            const path = save_path+'poster_'+tab[i].title+'.png'
+            const path = save_path+'poster_'+tab[i].id+'.png'
             download(url, path, () => {
-              console.log('Download of poster done!')
             })
+            console.log('Download of '+tab[i].title+' poster done!')
           }
         }
       }
@@ -305,10 +305,10 @@ function search_date(input,year,sorted,save_path){
               })
             }
             const url = tab[i].poster
-            const path = save_path+'poster_'+tab[i].title+'.png'
+            const path = save_path+'poster_'+tab[i].id+'_'+date_year+'.png'
             download(url, path, () => {
-              console.log('Download of poster done!')
             })
+            console.log('Download of '+tab[i].title+' poster done!')
           }
         }
       }
