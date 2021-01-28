@@ -1,5 +1,4 @@
-const { cookie } = require('request');
-
+request = require('request')
 fs=require('fs')
 Jimp=require('jimp')
 ColorThief = require('color-thief-jimp');
@@ -70,6 +69,88 @@ if (myArgs[0] === '-action'){
       genre=myArgs[4];
       //Fonction tri/affichage nom des films de l'année <year>
       search_key_word(input_dir,keyword,genre)
+      let stop5 = new Date().getTime();
+      console.log("Algorithme exécuté en: "+ (stop5-start) +" ms");
+      break;
+
+    case 'color':
+      //Dossier des images
+      path_dir=myArgs[2];
+      color_read(path_dir);
+      break;
+
+    //Dans le cas où il y a une erreur d'argument  
+    default:
+      console.log("Je n'ai pas compris..")
+  }
+}
+
+if (myArgs[0] === '-save'){
+  save_path = myArgs[1]
+  myArgs = myArgs.slice(2)
+  if(myArgs[0] === '-action')
+  //Checking de l'argument suivant '-action'
+  switch (myArgs[1]){
+     //Tri par date croissante
+     case 'transform':
+      console.log('Tri par date');
+      //Stockage des input/output (strings) 
+      input_dir = myArgs[2];
+      output_dir = myArgs[3];
+      console.log("Fichier d'input: " + input_dir);
+      console.log("Dossier d'output: " + output_dir);
+      //Lancer fonction tri date
+      date(input_dir,output_dir);
+      let stop1 = new Date().getTime();
+      console.log("Algorithme exécuté en: " + stop1-start + " ms");
+      break;
+    //Tri par date croissante
+    case 'sort_date':
+      console.log('Tri par date');
+      //Stockage des input/output (strings) 
+      input_dir = myArgs[2];
+      output_dir = myArgs[3];
+      console.log("Fichier d'input: " + input_dir);
+      console.log("Dossier d'output: " + output_dir);
+      //Lancer fonction tri date
+      sort_date(input_dir,output_dir);
+      let stop2 = new Date().getTime();
+      console.log("Algorithme exécuté en: " + stop2-start + " ms");
+      break;
+
+    case 'sort_title': 
+      console.log('Tri par titre');
+      //Stockage des input/output (strings) 
+      input_dir = myArgs[2];
+      output_dir = myArgs[3];
+      console.log("Fichier d'input: " + input_dir);
+      console.log("Dossier d'output: " + output_dir);
+      //Lancer fonction tri titre
+      sort_title(input_dir,output_dir);
+      let stop3 = new Date().getTime();
+      console.log("Algorithme exécuté en: " + (stop3-start) + " ms");
+      break;
+
+    case 'search_date':
+      console.log('Recherche de film par année de production');
+      //Stockage des input/output
+      input_dir=myArgs[2];
+      year=myArgs[3];
+      sorted=myArgs[4];
+      //Fonction tri/affichage nom des films de l'année <year>
+      search_date(input_dir,year,sorted,save_path)
+      let stop4 = new Date().getTime();
+      console.log("Algorithme exécuté en: " + (stop4-start) + " ms");
+      break;
+    
+    case 'search_key_word':
+      console.log('Recherche du film le plus récent, genre: ['+myArgs[4]+'] et qui comporte le mot clé ['+ myArgs[3]+']');
+      //Stockage des input/output
+      input_dir=myArgs[2];
+      keyword=myArgs[3];
+      genre=myArgs[4];
+      //Fonction tri/affichage nom des films de l'année <year>
+      search_key_word(input_dir,keyword,genre,save_path)
       let stop5 = new Date().getTime();
       console.log("Algorithme exécuté en: "+ (stop5-start) +" ms");
       break;
@@ -232,7 +313,7 @@ function part_title(tab,first,last,pivot){
 }
 
 //Fonction lecture du fichier + affichage console: titre des film triés selon une année précise
-function search_date(input,year,sorted){
+function search_date(input,year,sorted,save_path){
   //Lecture du fichier 'input'
   fs.readFile(input, (err, data) => {
     if (err) throw err;
@@ -250,6 +331,22 @@ function search_date(input,year,sorted){
         if(date_year == year){
           //Afficher le titre de celui-ci (+année)
           console.log(tab[i].title + ' ('+year+')');
+          
+          if(save_path){
+
+            const download = (url, path, callback) => {
+              request.head(url, (err, res, body) => {
+                request(url)
+                .pipe(fs.createWriteStream(path))
+                .on('close', callback)
+              })
+            }
+            const url = tab[i].poster
+            const path = save_path+'poster_'+tab[i].title+'.png'
+            download(url, path, () => {
+              console.log('Download of poster done!')
+            })
+          }
         }
       }
     }
@@ -262,6 +359,21 @@ function search_date(input,year,sorted){
         if(date_year == year){
           //Afficher le titre de celui-ci (+année)
           console.log(tab[i].title + ' ('+year+')');
+          if(save_path){
+
+            const download = (url, path, callback) => {
+              request.head(url, (err, res, body) => {
+                request(url)
+                .pipe(fs.createWriteStream(path))
+                .on('close', callback)
+              })
+            }
+            const url = tab[i].poster
+            const path = save_path+'poster_'+tab[i].title+'.png'
+            download(url, path, () => {
+              console.log('Download of poster done!')
+            })
+          }
         }
       }
     }
@@ -272,7 +384,7 @@ function search_date(input,year,sorted){
   });
 }
 //Fonction lecture du fichier + affichage console: titre du film le plus récent + genre + mot clé
-function search_key_word(input,keyword,genre){
+function search_key_word(input,keyword,genre,save_path){
   //Lecture du fichier 'input'
   fs.readFile(input, (err, data) => {
     if (err) throw err;
@@ -300,6 +412,23 @@ function search_key_word(input,keyword,genre){
     let rec = new Date(filtered[0].release_date*1000)
     //Affichage du titre + date + description du film trié
     console.log(filtered[0].title+" ("+rec+"). Description: "+filtered[0].overview);
+    
+    if(save_path){
+
+      const download = (url, path, callback) => {
+        request.head(url, (err, res, body) => {
+          request(url)
+          .pipe(fs.createWriteStream(path))
+          .on('close', callback)
+        })
+      }
+      const url = filtered[0].poster
+      const path = save_path+'poster_'+filtered[0].title+'.png'
+      download(url, path, () => {
+        console.log('Download of poster done!')
+      })
+      
+    }
 });
 }
 
