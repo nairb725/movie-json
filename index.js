@@ -200,7 +200,18 @@ function search_date(input,year,sorted){
     let tab = (JSON.parse(data));
     //Vérification de la valeur "true/false" de sorted
     if(sorted === 'true'){
-      console.log('true');
+      //utilisation de "tri_title" afin de trier les titres dans l'ordre alphabétique
+      tri_title(tab,0,tab.length-1)
+      for(i=0;i<tab.length;i++){
+        //Extraction de l'année de parution pour chaque film à l'aide d'une boucle for
+        date = new Date(tab[i].release_date * 1000)
+        date_year = date.getFullYear();
+        //Si l'année du film correspond à la demande utilisateur
+        if(date_year == year){
+          //Afficher le titre de celui-ci (+année)
+          console.log(tab[i].title + ' ('+year+')');
+        }
+      }
     }
     else if(sorted === 'false'){
       for(i=0;i<tab.length;i++){
