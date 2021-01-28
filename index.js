@@ -1,5 +1,8 @@
+const { cookie } = require('request');
+
 fs=require('fs')
 Jimp=require('jimp')
+ColorThief = require('color-thief-jimp');
 let start = new Date().getTime();
 //Retire les deux premiers arguments qui sont toujours les mêmes
 let myArgs = process.argv.slice(2);
@@ -44,7 +47,7 @@ if (myArgs[0] === '-action'){
       //Lancer fonction tri titre
       sort_title(input_dir,output_dir);
       let stop3 = new Date().getTime();
-      console.log("Algorithme exécuté en: " + stop3-start + " ms");
+      console.log("Algorithme exécuté en: " + (stop3-start) + " ms");
       break;
 
     case 'search_date':
@@ -60,7 +63,7 @@ if (myArgs[0] === '-action'){
       break;
     
     case 'search_key_word':
-      console.log('Recherche du film le plus récent, selon le genre et qui comporte le mot clé '+ myArgs[3]);
+      console.log('Recherche du film le plus récent, genre: ['+myArgs[4]+'] et qui comporte le mot clé ['+ myArgs[3]+']');
       //Stockage des input/output
       input_dir=myArgs[2];
       keyword=myArgs[3];
@@ -72,8 +75,8 @@ if (myArgs[0] === '-action'){
       break;
 
     case 'color':
+      //Dossier des images
       path_dir=myArgs[2];
-
       color_read(path_dir);
       break;
 
@@ -110,7 +113,7 @@ function sort_date(input,output_dir){
     //Stock des données dans tab
     let tab = (JSON.parse(data));
     //Tri des données
-    tri_date(tab,0,tab.length-1);
+    tri_date_ASC(tab,0,tab.length-1);
     //Ecriture du fichier 'output' avec les films trié par date croissante
     fs.writeFile(output_dir,JSON.stringify(tab,null,'\t'),function(err) {
       if(err) return console.error(err);
@@ -120,17 +123,17 @@ function sort_date(input,output_dir){
 }
 
 //Fonction tri films par date croissante
-function tri_date(tab,first,last){
+function tri_date_ASC(tab,first,last){
   //Si premier < dernier
   if (first<last){
     let pivot = Math.floor((first+last)/2)
-    pivot = part_date(tab,first,last,pivot)
-    tri_date(tab,first,pivot-1)
-    tri_date(tab,pivot+1,last)
+    pivot = part_date_ASC(tab,first,last,pivot)
+    tri_date_ASC(tab,first,pivot-1)
+    tri_date_ASC(tab,pivot+1,last)
   }
 }
 
-function part_date(tab,first,last,pivot){
+function part_date_ASC(tab,first,last,pivot){
   //Echanger tab[pivot] avec tab[last]
   swap(tab,pivot,last)
   //j premier élément
@@ -140,6 +143,36 @@ function part_date(tab,first,last,pivot){
     //Tri croissant ici
     if (tab[i].release_date <tab[last].release_date){
       //Echange tab[i] et tab[last] pour respecter l'ordre croissant
+      swap(tab,i,j);
+      j=j+1;
+    }
+  }
+  //Pour échanger tab[last] et tab[j]
+  swap(tab,last,j)
+  //Renvoie j
+  return j
+}
+//Fonction tri films par date décroissante
+function tri_date_DESC(tab,first,last){
+  //Si premier < dernier
+  if (first<last){
+    let pivot = Math.floor((first+last)/2)
+    pivot = part_date_DESC(tab,first,last,pivot)
+    tri_date_DESC(tab,first,pivot-1)
+    tri_date_DESC(tab,pivot+1,last)
+  }
+}
+
+function part_date_DESC(tab,first,last,pivot){
+  //Echanger tab[pivot] avec tab[last]
+  swap(tab,pivot,last)
+  //j premier élément
+  j = first;
+  //Exploration du tableau
+  for (i=first;i<=last-1;i++){
+    //Tri croissant ici
+    if (tab[i].release_date > tab[last].release_date){
+      //Echange tab[i] et tab[last] pour respecter l'ordre décroissant
       swap(tab,i,j);
       j=j+1;
     }
@@ -252,7 +285,7 @@ function search_key_word(input,keyword,genre){
       return true;
     })
     //Fonction de tri par date croissante
-    tri_date(filtered,0,filtered.length-1);
+    tri_date_DESC(filtered,0,filtered.length-1);
     let rec = new Date(filtered[0].release_date*1000)
     //Affichage du titre + date + description du film trié
     console.log(filtered[0].title+" ("+rec+"). Description: "+filtered[0].overview);
@@ -267,10 +300,50 @@ function swap(tab,a,b){
 }
 
 function color_read(path){
-  Jimp.read(path,function (err, image) {
-    p1 = image.getPixelColor(10, 10);
-    // returns the colour of that pixel e.g. 0xFFFFFFFF
-    console.log(Jimp.intToRGBA(p1));
-    // e.g. converts 0xFFFFFFFF to {r: 255, g: 255, b: 255, a:255}
+  color_avg = [0,0,0];  //Init array 0 0 0 (couleurs rgb)
+  fs.readdir(path, (err, files) => {  //read folder dir
+    files.forEach(file => {   //for each file do...
+      Jimp.read(path+file)  //read image
+      .then(image => {  
+        var dominantColor = ColorThief.getColor(image);
+        // console.log(dominantColor);
+        // dominantColor = [intRed, intGreen, intBlue]
+        color_avg[0] += dominantColor[0];   //En gros jveux remplir mon tableau
+        color_avg[1] += dominantColor[1];   //avg en additionnant les valeurs
+        color_avg[2] += dominantColor[2];   //a chaque read
+        // console.log(color_avg); //ça en gros ça marche mais ça boucle(normal)
+
+        color_avg[0] = Math.floor(color_avg[0] / files.length);   //Moyenne de chaque teinte de couleur
+        color_avg[1] = Math.floor(color_avg[1] / files.length);   // avg(r) puis g puis b
+        color_avg[2] = Math.floor(color_avg[2] / files.length); 
+        // console.log(color_avg);     
+
+        avg_color_folder = RGBToHex(color_avg[0],color_avg[1],color_avg[2]) //Fonction pour convertir le RGB en #Hex (css-style)
+
+        console.log('La couleur dominante du dossier est: '+avg_color_folder);
+
+      })                        //Et jveux le sortir de la boucle pour
+      .catch(err => {           //faire une moyenne à la fin en fonction de
+        console.error(err);     //files.length
+        return;
+      });
     });
+  });
+  console.log('ptdr '+color_avg);
+}
+
+function RGBToHex(r,g,b){ //Conversion en Hex en fonction de RGB moyen du dossier
+  r = r.toString(16);
+  g = g.toString(16);
+  b = b.toString(16);
+  if(r.length == 1){
+    r = '0'+r;
+  }
+  if(g.length == 1){
+    g = '0'+g;
+  }
+  if(b.length == 1){
+    b = '0'+b;
+  }
+  return ('#'+r+g+b)
 }
