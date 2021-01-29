@@ -34,9 +34,7 @@ function switch_menu(save_path) {
         console.log("Fichier d'input: " + input_dir);
         console.log("Dossier d'output: " + output_dir);
         //Lancer fonction tri date
-        date(input_dir, output_dir);
-        let stop1 = new Date().getTime();
-        console.log("Algorithme exécuté en: " + stop1 - start + " ms");
+        date(input_dir, output_dir,start);
         break;
 
       //Tri par date croissante
@@ -48,9 +46,7 @@ function switch_menu(save_path) {
         console.log("Fichier d'input: " + input_dir);
         console.log("Dossier d'output: " + output_dir);
         //Lancer fonction tri date
-        sort_date(input_dir, output_dir);
-        let stop2 = new Date().getTime();
-        console.log("Algorithme exécuté en: " + stop2 - start + " ms");
+        sort_date(input_dir, output_dir,start);
         break;
 
       case 'sort_title':
@@ -61,9 +57,7 @@ function switch_menu(save_path) {
         console.log("Fichier d'input: " + input_dir);
         console.log("Dossier d'output: " + output_dir);
         //Lancer fonction tri titre
-        sort_title(input_dir, output_dir);
-        let stop3 = new Date().getTime();
-        console.log("Algorithme exécuté en: " + (stop3 - start) + " ms");
+        sort_title(input_dir, output_dir,start);
         break;
 
       case 'search_date':
@@ -73,9 +67,7 @@ function switch_menu(save_path) {
         year = myArgs[3];
         sorted = myArgs[4];
         //Fonction tri/affichage nom des films de l'année <year>
-        search_date(input_dir, year, sorted, save_path);
-        let stop4 = new Date().getTime();
-        console.log("Algorithme exécuté en: " + (stop4 - start) + " ms");
+        search_date(input_dir, year, sorted, save_path,start);
         break;
 
       case 'search_key_word':
@@ -85,15 +77,13 @@ function switch_menu(save_path) {
         keyword = myArgs[3];
         genre = myArgs[4];
         //Fonction tri/affichage nom des films de l'année <year>
-        search_key_word(input_dir, keyword, genre, save_path);
-        let stop5 = new Date().getTime();
-        console.log("Algorithme exécuté en: " + (stop5 - start) + " ms");
+        search_key_word(input_dir, keyword, genre, save_path,start);
         break;
 
       case 'color':
         //Dossier des images
         path_dir = myArgs[2];
-        color_read(path_dir);
+        color_read(path_dir,start);
         break;
 
       //Dans le cas où il y a une erreur d'argument  
@@ -103,7 +93,7 @@ function switch_menu(save_path) {
 }
 
 //fonction pour mettre la date après le titre
-function date(input,output_dir){
+function date(input,output_dir,start){
   //Lecture du fichier 'input'
   fs.readFile(input, (err, data) => {
     if (err) throw err;
@@ -118,8 +108,11 @@ function date(input,output_dir){
     fs.writeFile(output_dir,JSON.stringify(tab,null,'\t'),function(err) {
       if(err) return console.error(err);
       console.log('Fichier avec date créé.');
+      let stop = new Date().getTime();
+      console.log("Algorithme exécuté en: " + (stop - start) + " ms");
       })
   });
+
 }
 //Fonction lecture du fichier + écriture: film triés par date croissante
 function sort_date(input,output_dir){
@@ -134,6 +127,8 @@ function sort_date(input,output_dir){
     fs.writeFile(output_dir,JSON.stringify(tab,null,'\t'),function(err) {
       if(err) return console.error(err);
       console.log('Fichier trié par date créé.');
+      let stop = new Date().getTime();
+      console.log("Algorithme exécuté en: " + (stop - start) + " ms");
       })
   });
 }
@@ -200,7 +195,7 @@ function part_date_DESC(tab,first,last,pivot){
 }
 
 //Fonction lecture du fichier + écriture: film triés par ordre alphabétique
-function sort_title(input,output_dir){
+function sort_title(input,output_dir,start){
   //Lecture du fichier 'input'
   fs.readFile(input, (err, data) => {
     if (err) throw err;
@@ -212,6 +207,8 @@ function sort_title(input,output_dir){
     fs.writeFile(output_dir,JSON.stringify(tab,null,'\t'),function(err) {
       if(err) return console.error(err);
       console.log('Fichier trié par ordre alphabétique (titres) créé.');
+      let stop = new Date().getTime();
+      console.log("Algorithme exécuté en: " + (stop - start) + " ms");
       })
   });
 }
@@ -248,7 +245,7 @@ function part_title(tab,first,last,pivot){
 }
 
 //Fonction lecture du fichier + affichage console: titre des film triés selon une année précise
-function search_date(input,year,sorted,save_path){
+function search_date(input,year,sorted,save_path,start){
   //Lecture du fichier 'input'
   fs.readFile(input, (err, data) => {
     if (err) throw err;
@@ -284,6 +281,8 @@ function search_date(input,year,sorted,save_path){
           }
         }
       }
+      let stop = new Date().getTime();
+      console.log("Algorithme exécuté en: " + (stop - start) + " ms");    
     }
     else if(sorted === 'false'){
       for(i=0;i<tab.length;i++){
@@ -312,6 +311,8 @@ function search_date(input,year,sorted,save_path){
           }
         }
       }
+      let stop = new Date().getTime();
+      console.log("Algorithme exécuté en: " + (stop - start) + " ms");    
     }
     else{
       //Case erreur sorted
@@ -320,7 +321,7 @@ function search_date(input,year,sorted,save_path){
   });
 }
 //Fonction lecture du fichier + affichage console: titre du film le plus récent + genre + mot clé
-function search_key_word(input,keyword,genre,save_path){
+function search_key_word(input,keyword,genre,save_path,start){
   //Lecture du fichier 'input'
   fs.readFile(input, (err, data) => {
     if (err) throw err;
@@ -364,6 +365,8 @@ function search_key_word(input,keyword,genre,save_path){
         console.log('Download of poster done!')
       })
     }
+    let stop = new Date().getTime();
+    console.log("Algorithme exécuté en: " + (stop - start) + " ms");
 });
 }
 
@@ -375,7 +378,7 @@ function swap(tab,a,b){
 }
 
 //Fonction pour afficher la couleur moyenne de tous les fichiers d'un dossier d'images
-function color_read(path){
+function color_read(path,start){
   color_avg = [0,0,0];  //Init array 0 0 0 (couleurs rgb)
   files = readdirSync(path);  //Lecture du dossier
   let promises = [];  //Array de promise
@@ -400,6 +403,8 @@ function color_read(path){
         
       console.log('La couleur dominante du dossier est: '+avg_color_folder); //Affichage #HEX
       console.log('Code RGB: {R:'+color_avg[0]+' G:'+color_avg[1]+' B:'+color_avg[2]+'}'); //Affichage R G B
+      let stop6 = new Date().getTime();
+      console.log("Algorithme exécuté en: " + (stop6 - start) + " ms");
   });
 }
 //Conversion en Hex en fonction de RGB moyen du dossier
