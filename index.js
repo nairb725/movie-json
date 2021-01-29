@@ -1,11 +1,9 @@
 const { readdirSync } = require('fs');
-
 request = require('request')
 fs=require('fs')
 Jimp=require('jimp')
 ColorThief = require('color-thief-jimp');
 let start = new Date().getTime();
-color_read('./images/')
 //Retire les deux premiers arguments qui sont toujours les mêmes
 let myArgs = process.argv.slice(2);
 let save_path;
@@ -40,6 +38,7 @@ function switch_menu(save_path) {
         let stop1 = new Date().getTime();
         console.log("Algorithme exécuté en: " + stop1 - start + " ms");
         break;
+
       //Tri par date croissante
       case 'sort_date':
         console.log('Tri par date');
@@ -53,6 +52,7 @@ function switch_menu(save_path) {
         let stop2 = new Date().getTime();
         console.log("Algorithme exécuté en: " + stop2 - start + " ms");
         break;
+
       case 'sort_title':
         console.log('Tri par titre');
         //Stockage des input/output (strings) 
@@ -65,6 +65,7 @@ function switch_menu(save_path) {
         let stop3 = new Date().getTime();
         console.log("Algorithme exécuté en: " + (stop3 - start) + " ms");
         break;
+
       case 'search_date':
         console.log('Recherche de film par année de production');
         //Stockage des input/output
@@ -147,7 +148,7 @@ function tri_date_ASC(tab,first,last){
     tri_date_ASC(tab,pivot+1,last)
   }
 }
-
+//Fonctio de tri film par date croissante
 function part_date_ASC(tab,first,last,pivot){
   //Echanger tab[pivot] avec tab[last]
   swap(tab,pivot,last)
@@ -177,7 +178,7 @@ function tri_date_DESC(tab,first,last){
     tri_date_DESC(tab,pivot+1,last)
   }
 }
-
+//Fonction tri films par date décroissante
 function part_date_DESC(tab,first,last,pivot){
   //Echanger tab[pivot] avec tab[last]
   swap(tab,pivot,last)
@@ -225,7 +226,7 @@ function tri_title(tab,first,last){
     tri_title(tab,pivot+1,last)
   }
 }
-
+//Fonction tri titre de films par ordre alphabétique
 function part_title(tab,first,last,pivot){
   //Echanger tab[pivot] avec tab[last]
   swap(tab,pivot,last)
@@ -373,53 +374,41 @@ function swap(tab,a,b){
   tab[b]=temp;
 }
 
+//Fonction pour afficher la couleur moyenne de tous les fichiers d'un dossier d'images
 function color_read(path){
   color_avg = [0,0,0];  //Init array 0 0 0 (couleurs rgb)
-  // fs.readdir(path, (err, files) => {  //read folder dir
-  //   let promises = []
-  //   files.forEach(file => {   //for each file do...
-  //     let promise = Jimp.read(path+file);  //read image
-  //     promises.push(promise);
-  //     })                        
-  //   });
-  files = readdirSync(path);
-  let promises = [];
-  files.forEach(file =>{
-    let promise = Jimp.read(path+file);
-    promises.push(promise)
+  files = readdirSync(path);  //Lecture du dossier
+  let promises = [];  //Array de promise
+  files.forEach(file =>{  //Pour chaque fichier du dossier
+    let promise = Jimp.read(path+file); //Stocking des promise(Jimp.read)
+    promises.push(promise) 
   });
     Promise.all(promises)
     .then((images) =>{
       images.forEach(image => {
           var dominantColor = ColorThief.getColor(image);
           // dominantColor = [intRed, intGreen, intBlue]
-          color_avg[0] += dominantColor[0];   //En gros jveux remplir mon tableau
+          color_avg[0] += dominantColor[0];   //
           color_avg[1] += dominantColor[1];   //avg en additionnant les valeurs
-          color_avg[2] += dominantColor[2];   //a chaque read
+          color_avg[2] += dominantColor[2];   //
       })
       color_avg[0] = Math.floor(color_avg[0] / files.length);   //Moyenne de chaque teinte de couleur
       color_avg[1] = Math.floor(color_avg[1] / files.length);   // avg(r) puis g puis b
-      color_avg[2] = Math.floor(color_avg[2] / files.length); 
+      color_avg[2] = Math.floor(color_avg[2] / files.length);   //
         
       avg_color_folder = RGBToHex(color_avg[0],color_avg[1],color_avg[2]) //Fonction pour convertir le RGB en #Hex (css-style)
         
-      console.log('La couleur dominante du dossier est: '+avg_color_folder);
-      console.log('Code RGB= R:'+color_avg[0]+' G:'+color_avg[1]+' B:'+color_avg[2]);
+      console.log('La couleur dominante du dossier est: '+avg_color_folder); //Affichage #HEX
+      console.log('Code RGB: {R:'+color_avg[0]+' G:'+color_avg[1]+' B:'+color_avg[2]+'}'); //Affichage R G B
   });
 }
-
-function RGBToHex(r,g,b){ //Conversion en Hex en fonction de RGB moyen du dossier
+//Conversion en Hex en fonction de RGB moyen du dossier
+function RGBToHex(r,g,b){ 
   r = r.toString(16);
   g = g.toString(16);
   b = b.toString(16);
-  if(r.length == 1){
-    r = '0'+r;
-  }
-  if(g.length == 1){
-    g = '0'+g;
-  }
-  if(b.length == 1){
-    b = '0'+b;
-  }
+  if(r.length == 1){r = '0'+r;}
+  if(g.length == 1){g = '0'+g;}
+  if(b.length == 1){b = '0'+b;}
   return ('#'+r+g+b)
 }
